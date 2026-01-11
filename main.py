@@ -103,7 +103,7 @@ class Taschenrechner(QMainWindow):
 
     def keyPressEvent(self, event: QKeyEvent):
         key = event.key()
-        print(f"Key pressed: {key}")
+        # print(f"Key pressed: {key}")
         match key:
             case Qt.Key.Key_0:
                 self.button_clicked("0")
@@ -160,7 +160,7 @@ class Taschenrechner(QMainWindow):
 
     
     def button_clicked(self, value):
-        print(f"Button {value} clicked.")
+        #print(f"Button {value} clicked.")
         if value != "=":
             self.update_anzeigen(value)
         else:
@@ -173,7 +173,7 @@ class Taschenrechner(QMainWindow):
         if self.anzeige_rechenschritte.text() == "0":
             self.anzeige_rechenschritte.setText("")
 
-        print(f"Updating main display to: {text}")
+        #print(f"Updating main display to: {text}")
         if text.isnumeric() or text == ".":            
             self.hauptanzeige.setText(self.hauptanzeige.text() + text)
         else:
@@ -224,14 +224,18 @@ class Taschenrechner(QMainWindow):
                 stop_parentheses = current_closing_index
                 returned_expressions.append(self.extract_parentheses2(expression=expression[start_parentheses : stop_parentheses])) 
         
-        for i in range(len(opening_indices)):
-            if i == 0:
+        for i in range(len(opening_indices) + 1):
+            if i == 0 and len(opening_indices) == 0:
+                partial_expressions.append(expression)
+            elif i == 0 and len(opening_indices) > 0:
                 partial_expressions.append(expression[:opening_indices[i]])
-            elif i > 0:
-                partial_expressions.append(expression[closing_indices[i-1 : opening_indices[i]]])
+            elif i > 0 and len(opening_indices) > i:
+                partial_expressions.append(expression[closing_indices[i-1] : opening_indices[i]])
+            elif i > 0 and len(opening_indices) <= i:             
+                 partial_expressions.append(expression[closing_indices[i-1]:])
         
         for i in range(len(partial_expressions)):
-            if i < len(partial_expressions):
+            if i < len(partial_expressions) and i < len(returned_expressions):
                 new_expression += partial_expressions[i] + returned_expressions[i]
             else:
                 new_expression += partial_expressions[i]
