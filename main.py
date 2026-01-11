@@ -233,7 +233,7 @@ class Taschenrechner(QMainWindow):
                 partial_expressions.append(expression[closing_indices[i-1] : opening_indices[i]])
             elif i > 0 and len(opening_indices) <= i:             
                  partial_expressions.append(expression[closing_indices[i-1]:])
-        
+                        
         for i in range(len(partial_expressions)):
             if i < len(partial_expressions) and i < len(returned_expressions):
                 new_expression += partial_expressions[i] + returned_expressions[i]
@@ -244,29 +244,63 @@ class Taschenrechner(QMainWindow):
         new_expression = new_expression.replace(")", "")
         print(f"new_expression: {new_expression}")
         
-        return new_expression
+        result = self.calculate_parentheses_result(new_expression)
 
-        # expression = expression.replace("(", "")
-        # expression = expression.replace(")", "")
-        # print(f"Expression: {expression}")
+        # To-do: Weiterverarbeitung der Ergebnisse der Klammerausdrücke
 
-        # return expression
+        return result
 
 
-
-    def extract_parentheses(self, expression):
-        print("Parsing expression stack.")
-        stack = []
-        results = []
-        for i, char in enumerate(expression):
-            if char == "(":
-                stack.append(i)
-            elif char == ")":
-                start = stack.pop()
-                results.append(expression[start + 1:i])
+    def calculate_parentheses_result(self, expression):
         
-        print(f"Extracted parentheses expressions: {results}")
-        return results
+        numbers = [["", ""]]
+        counter_numbers = 0
+        result = 0
+
+        for i, char in enumerate(expression):
+            if char.isnumeric() or i == 0:
+                numbers[counter_numbers][0] += char
+            elif not char.isnumeric():
+                numbers[counter_numbers][1] = char
+                counter_numbers += 1
+                numbers.append(["", ""])
+
+        # for number in numbers:
+        #     print(number)
+
+        for i in range(len(numbers)):
+            if i == 0:
+                result = int(numbers[i][0])
+            else:
+                match(numbers[i - 1][1]):
+                    case "+":
+                        result += int(numbers[i][0])
+                    case "-":
+                        result -= int(numbers[i][0])
+                    case "/":
+                        result /= int(numbers[i][0])
+                    case "*":
+                        result *= int(numbers[i][0])
+
+        print(f"Result: {result}")
+
+        return result
+                        
+
+
+    # def extract_parentheses(self, expression):
+    #     print("Parsing expression stack.")
+    #     stack = []
+    #     results = []
+    #     for i, char in enumerate(expression):
+    #         if char == "(":
+    #             stack.append(i)
+    #         elif char == ")":
+    #             start = stack.pop()
+    #             results.append(expression[start + 1:i])
+        
+    #     print(f"Extracted parentheses expressions: {results}")
+    #     return results
 
     
     def clear(self, clear_anzeige_rechenschritte=False, clear_hauptanzeige=False):
